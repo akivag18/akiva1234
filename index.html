@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rock Paper Scissors</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1d2671, #c33764);
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      margin-top: 30px;
+      font-size: 3rem;
+    }
+
+    .game-container {
+      margin-top: 40px;
+    }
+
+    .choices {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 30px 0;
+    }
+
+    .choice {
+      font-size: 80px;
+      cursor: pointer;
+      padding: 20px;
+      border-radius: 20px;
+
+    .choice:hover {
+      transform: scale(1.2);
+      background: rgba(255,255,255,0.2);
+    }
+
+    .result {
+      font-size: 1.5rem;
+      margin-top: 20px;
+    }
+
+    .score {
+      font-size: 1.2rem;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>✊ ✋ ✌ Rock Paper Scissors</h1>
+
+  <div class="game-container">
+    <p>Choose your move:</p>
+
+    <div class="choices">
+      <div class="choice" onclick="play('rock')">✊</div>
+      <div class="choice" onclick="play('paper')">✋</div>
+      <div class="choice" onclick="play('scissors')">✌</div>
+    </div>
+
+    <div class="result" id="result"></div>
+    <div class="score" id="score">You: 0 | Computer: 0</div>
+  </div>
+
+  <script>
+    let playerScore = 0;
+    let computerScore = 0;
+
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+
+    function playSound(freq, duration = 0.25) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.frequency.value = freq;
+      osc.type = "sine";
+
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        audioCtx.currentTime + duration
+      );
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function play(playerChoice) {
+      playSound(600); // click sound
+
+      const choices = ["rock", "paper", "scissors"];
+      const computerChoice =
+        choices[Math.floor(Math.random() * choices.length)];
+
+      let text = `You chose ${playerChoice}. Computer chose ${computerChoice}. `;
+
+      if (playerChoice === computerChoice) {
+        text += "🤝 It's a tie!";
+        playSound(400);
+      } else if (
+        (playerChoice === "rock" && computerChoice === "scissors") ||
+        (playerChoice === "paper" && computerChoice === "rock") ||
+        (playerChoice === "scissors" && computerChoice === "paper")
+      ) {
+        text += "🎉 You win!";
+        playerScore++;
+        playSound(900);
+      } else {
+        text += "😢 You lose!";
+        computerScore++;
+        playSound(200);
+      }
+
+      document.getElementById("result").textContent = text;
+      document.getElementById("score").textContent =
+        `You: ${playerScore} | Computer: ${computerScore}`;
+    }
+  </script>
+
+</body>
+</html>
